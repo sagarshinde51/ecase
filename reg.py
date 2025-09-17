@@ -39,20 +39,20 @@ def get_all_patients():
 # -------------------- Fetch Medical History --------------------
 def get_medical_history_by_rfid(rfidno):
     conn = get_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
     try:
-        # ✅ Use parameterized query to prevent SQL injection
+        # ✅ Corrected table name and query
         cursor.execute(
-            "SELECT * FROM medical_histroy WHERE RFIDNo = %s ORDER BY ID DESC",
+            """
+            SELECT ID, RFIDNo, DoctorAssigned, Description, tablets
+            FROM medical_histroy
+            WHERE RFIDNo = %s
+            ORDER BY ID DESC
+            """,
             (rfidno,)
         )
         rows = cursor.fetchall()
-        
-        #if not rows or cursor.description is None:
-        #    return []
-
-        columns = [col[0] for col in cursor.description]
-        return [dict(zip(columns, row)) for row in rows]
+        return rows if rows else []
 
     except Exception as e:
         st.error(f"❌ Error fetching medical history for RFID {rfidno}: {e}")
@@ -60,7 +60,6 @@ def get_medical_history_by_rfid(rfidno):
     finally:
         cursor.close()
         conn.close()
-
 # -------------------- Fetch Appointments --------------------
 def get_current_appointments():
     conn = get_connection()
