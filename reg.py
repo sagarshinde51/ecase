@@ -158,24 +158,24 @@ elif menu == "View All Patients":
 
 # -------------------- View Medical History -------------------
 elif menu == "View Medical History":
-    st.subheader("📖 Medical History Records")
+    rfid_filter = st.query_params.get("rfid_filter", [None])[0]
+    
+    if rfid_filter:
+        st.subheader(f"📖 Medical History for RFID: {rfid_filter}")
+        try:
+            data = get_medical_history_by_rfid(rfid_filter)   # ✅ fixed
+            if data:
+                df = pd.DataFrame(data)
+                st.dataframe(df, use_container_width=True)
+            else:
+                st.warning("No medical history records found for this RFID.")
+        except Exception as e:
+            st.error(f"❌ Error fetching medical history: {e}")
+    
+        st.markdown("[🔙 Back to Main Page](./)", unsafe_allow_html=True)
+        st.stop()
 
-    try:
-        rfid_input = st.text_input("Enter RFIDNo to filter (optional)")
-        data = get_medical_history_by_rfid(rfid_filter)
-        st.write(data)
-
-        if rfid_filter:
-            data = [record for record in data if rfid_filter.lower() in record.get('RFIDNo', '').lower()]
-
-        if data:
-            df = pd.DataFrame(data)
-            st.dataframe(df, use_container_width=True)
-        else:
-            st.info("No medical history records found.")
-    except Exception as e:
-        st.error(f"❌ Error fetching medical history: {e}")
-
+    
 # -------------------- Current Appointments -------------------- 
 elif menu == "Current Appointments":
     st.subheader("📅 Current Appointments")
