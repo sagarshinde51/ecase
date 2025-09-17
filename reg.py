@@ -159,22 +159,30 @@ elif menu == "View All Patients":
 # -------------------- View Medical History -------------------
 elif menu == "View Medical History":
     st.subheader("📖 Medical History Records")
+
     try:
-        rfid_input = st.text_input("Enter RFIDNo to filter (optional)")
-        data = get_medical_history_by_rfid(rfid_input) if rfid_input else get_medical_history_by_rfid("")  
+        # 🔹 Get all appointments first
+        appointments = get_current_appointments()
+        rfid_list = [row['RFID_No'] for row in appointments if row.get('RFID_No')]
 
-        if rfid_input:
-            data = [record for record in data if rfid_input.lower() in record.get('RFIDNo', '').lower()]
+        if rfid_list:
+            # 🔹 Dropdown for selecting RFID
+            selected_rfid = st.selectbox("Select RFID to view history", rfid_list)
 
-        if data:
-            df = pd.DataFrame(data)
-            st.dataframe(df, use_container_width=True)
+            if selected_rfid:
+                data = get_medical_history_by_rfid(selected_rfid)
+
+                if data:
+                    df = pd.DataFrame(data)
+                    st.dataframe(df, use_container_width=True)
+                else:
+                    st.warning(f"No medical history found for RFID {selected_rfid}")
         else:
-            st.info("No medical history records found.")
+            st.info("No RFID numbers found in current appointments.")
+
     except Exception as e:
         st.error(f"❌ Error fetching medical history: {e}")
 
-    
 # -------------------- Current Appointments -------------------- 
 elif menu == "Current Appointments":
     st.subheader("📅 Current Appointments")
