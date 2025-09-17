@@ -37,14 +37,14 @@ def get_all_patients():
     return rows
 
 # -------------------- Fetch Medical History --------------------
-def get_medical_history_by_rfid(rfidno):
+def get_medical_history_by_rfid(rfidno="41E2014B"):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
     try:
-        # ✅ Corrected table name and query
+        # ✅ Select all columns, filter by RFIDNo
         cursor.execute(
             """
-            SELECT ID, RFIDNo, DoctorAssigned, Description, tablets
+            SELECT * 
             FROM medical_histroy
             WHERE RFIDNo = %s
             ORDER BY ID DESC
@@ -52,7 +52,7 @@ def get_medical_history_by_rfid(rfidno):
             (rfidno,)
         )
         rows = cursor.fetchall()
-        st.write(rfidno)
+        st.write(f"Filtering by RFIDNo: {rfidno}")
         return rows if rows else []
 
     except Exception as e:
@@ -61,6 +61,7 @@ def get_medical_history_by_rfid(rfidno):
     finally:
         cursor.close()
         conn.close()
+
 # -------------------- Fetch Appointments --------------------
 def get_current_appointments():
     conn = get_connection()
