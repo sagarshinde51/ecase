@@ -52,6 +52,7 @@ def get_medical_history_by_rfid(rfidno):
             (rfidno,)
         )
         rows = cursor.fetchall()
+        St.write(rows)
         return rows if rows else []
 
     except Exception as e:
