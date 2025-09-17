@@ -45,7 +45,7 @@ def get_medical_history_by_rfid(rfidno="41E2014B"):
         cursor.execute(
             """
             SELECT * 
-            FROM medical_histroy
+            FROM medical__histroy
             WHERE RFIDNo = %s
             ORDER BY ID DESC
             """,
